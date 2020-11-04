@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		//这个函数定义在C端,在请求完数据自动回调  注意位置,因为是顺序执行
+		function fn (data) {
+			console.log('客户端的fn函数被调用了');
+			console.log(data);
+		}
+	</script>
+	<!--json不属于ajax  但是可以模拟ajax请求 并且不受同源政策的影响	-->
+	<!-- 1.将非同源服务器端的请求地址写在script标签的src属性中 ★★★ -->
+	<script src="http://localhost:3001/test2"></script>
+</body>
+</html>

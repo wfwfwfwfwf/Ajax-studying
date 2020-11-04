@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+<button id="btn1">按钮1</button>
+<button id="btn2">按钮2</button>
+<button id="btn3">按钮3</button>
+<button id="btn4">按钮4</button>
+
+	<script src="/js/jquery.min.js"></script>
+	<script type="text/javascript">
+	/*	restful API风格的代码(一套规范)
+		GET:获取数据
+		POST:添加数据
+		PUT:更新数据
+		DELETE:删除数据
+		*/
+		// 获取用户列表信息
+	document.getElementById('btn1').onclick=function(){
+		$.ajax({
+			type: 'get',
+			url: '/users',
+			success: function (response) {
+				console.log(response)
+			}
+		})
+	}
+
+document.getElementById('btn2').onclick=function(){
+	// 获取id为1的用户信息
+	$.ajax({
+		type: 'get',
+		url: '/users/10/20/男',
+	/*	params:{
+			id:"10",
+			age:"20",
+			sex:'male'
+		},*/
+		success: function (response) {
+			console.log(response)
+		}
+	})
+}
+
+	document.getElementById('btn3').onclick=function(){
+		// 删除id为10的用户信息
+		$.ajax({
+			type: 'delete',
+			url: '/users/10',
+			success: function (response) {
+				console.log(response)
+			}
+		})
+	}
+
+	document.getElementById('btn4').onclick=function(){
+		// 修改id为10的用户信息
+		$.ajax({
+			type: 'put',
+			url: '/users/10',
+			success: function (response) {
+				console.log(response)
+			}
+		})
+	}
+
+	</script>
+</body>
+</html>

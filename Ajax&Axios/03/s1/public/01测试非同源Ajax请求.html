@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script type="text/javascript" src="/js/ajax.js"></script>
+	<script type="text/javascript">
+		//同源: 协议  域名 端口号(默认80)三者相同即为同源
+		// (协议)http://(域名)www.badu.com/
+		// http://127.0.0.1:3000/
+		//ajax不能向非同源S端发送请求★(能发出去但是没有回应)
+
+		ajax({
+			url: 'http://localhost:3001/test',
+			type: 'get',
+			success: function (result) {
+				console.log(result);
+			}
+		})
+		//我要的是3001端口的数据 但是我请求的服务器是3000端口,发送失败
+	</script>
+</body>
+</html>

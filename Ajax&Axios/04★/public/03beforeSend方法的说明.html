@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>$.ajax方法基本使用</title>
+</head>
+<body>
+	<button id="btn">发送请求</button>
+	<script src="/js/jquery.min.js"></script>
+	<script>
+		$('#btn').on('click', function () {
+			$.ajax({
+				type: 'post',
+				url: '/user',
+				// 在ajax请求发送之前调用
+				beforeSend: function () {
+					// alert('请求即将被发送');
+					// 作用:if 对用户做一些验证 ,若不通过验证则ajax请求发不出去
+					alert('请求不会被发送');
+					// 请求不会被发送★★★★
+					return false;
+				},
+				success: function (response) {
+					console.log(response);
+				}
+			})
+		});
+	</script>
+</body>
+</html>

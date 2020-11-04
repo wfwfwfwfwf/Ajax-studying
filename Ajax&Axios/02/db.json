@@ -1,0 +1,16 @@
+{
+ "emails":[
+             {"email": "1667442148@qq.com"},
+             {"email": "1667442149@qq.com"},
+             {"email": "1667442150@qq.com"}
+ ],
+  "list": [
+    {"listValue": "黑马程序员"},
+    {"listValue": "黑马程序员官网"},
+    {"listValue": "黑马程序员尼玛"},
+    {"listValue": "传智播客"},
+    {"listValue": "传智播客就是好"}
+  ]
+
+
+}

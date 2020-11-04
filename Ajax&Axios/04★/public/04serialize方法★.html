@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>serialize方法说明</title>
+</head>
+<body>
+	<form id="form">
+		<input type="text" name="username">
+		<input type="password" name="password">
+		<input type="submit" value="提交">
+	</form>
+	<script src="js/jquery.min.js"></script>
+	<script type="text/javascript">
+		//为表单添加提交事件
+		$('#form').on('submit', function (e) {
+			// serialize方法将表单内容拼接成字符串类型的参数★★★★★(不用formData对象 h5的)
+			// var params = $('#form').serialize();
+			// console.log(params)   username=zs&password=123456把这个赋给$.ajax中的data就可以了★★★
+			var x = serializeObject($(this));
+			console.log(x)
+			//阻止表单默认跳转行为方式1
+			// return false;
+			//阻止表单默认跳转行为方式2
+			e.preventDefault()
+		});
+
+		// 将表单中用户输入的内容   转换为对象类型
+		function serializeObject (obj) {
+			// 处理结果对象
+			var result = {};
+			//obj.serializeArray(jq的方法):将用户输入的表单控件的内容变成数组 元素是对象类型,每个元素都有属性及其值★★★★★
+		/*	 [
+					{name: 'username', value: '用户输入的内容'},
+			    {name: 'password', value: '123456'}
+			   ]
+		 */
+			var params = obj.serializeArray();
+
+			// 循环数组 将数组多对象转换为  单个对象类型
+			// value是对象元素     index是数组下标
+			$.each(params, function (index, value) {
+				//{username :'zs',password : '123456'}
+				result[value.name] = value.value;
+			})
+			// 将处理的结果返回到函数外部
+			return result;
+		}
+
+	</script>
+</body>
+</html>

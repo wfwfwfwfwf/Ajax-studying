@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Todo List</title>
+		<link rel="stylesheet" href="assets/css/base.css">
+		<link rel="stylesheet" href="assets/css/index.css">
+		<link rel="stylesheet" href="/js/nprogress/nprogress.css">
+
+
+	</head>
+	<body>
+		<section class="todoapp">
+			<header class="header">
+				<h1>todos</h1>
+				<!--输入新任务的栏-->
+				<input type="text" class="new-todo" placeholder="今天做点什么呢" autofocus id="task">
+			</header>
+			<!-- 已有任务显示的地方,通过ajax请求回来的数据渲染模板最终显示在ul里面 -->
+			<section class="main">
+			<!--未知作用				-->
+				<input class="toggle-all" type="checkbox">
+				<!--任务列表的容器 li的类说明:editing编辑状态;completed:完成-->
+				<ul class="todo-list" id="todo-list">
+				<!--模板最终渲染的地方-->
+				</ul>
+			</section>
+			<!-- This footer should hidden by default and shown when there are todos -->
+			<footer class="footer">
+				<!-- 底栏任务总数 -->
+				<span class="todo-count">未完成数目:<strong id="count">0</strong> </span>
+				<!-- 底栏 -->
+				<ul class="filters">
+					<li>
+						<a class="selected" href="javascript:;" id="all">全部</a>
+					</li>
+					<li>
+						<a href="javascript:;" id="active">未完成</a>
+					</li>
+					<li>
+						<a href="javascript:;" id="actived">已完成</a>
+					</li>
+				</ul>
+				<button class="clear-completed">清除已完成</button>
+
+			</footer>
+		</section>
+<!--		<script src="../js/jquery.min.js"></script>-->
+		<script src="/js/jquery.min.js"></script>
+		<script src="/js/template-web.js"></script>
+		<script src="/js/nprogress/nprogress.js"></script>
+		<!--工具类		-->
+<!--		<script src="../js/tools.js"></script>-->
+		<!-- 任务列表的模板 -->
+		<script type="text/html" id="taskTpl">
+			{{each tasks}}
+			<!-- li 的class标签的任务是否完成	 与下面的checked是同步关联的		-->
+			<li class="{{$value.completed ? 'completed' : ''}}">
+				<div class="view">
+					<!--任务是否完成 框框勾没勾上...只有IE能显示出来...-->
+					<input class="toggle" type="checkbox"  {{$value.completed ? 'checked' : ''}}>
+					<!--任务具体内容-->
+					<label>{{$value.title}}</label>
+					<!--删除任务-->
+					<button class="destroy" data-id="{{$value._id}}"></button>
+				</div>
+				<!--	编辑框	-->
+				<input class="edit">
+			</li>
+			{{/each}}
+		</script>
+		<script type="text/javascript">
+			// 声明用于存放任务列表的数组
+			var taskAry = [];
+			// 获取选择任务列表容器
+			var taskBox = $('#todo-list');
+			// 获取添加任务的文本框
+			var taskInp = $('#task');
+			// 获取用于存储未完成任务数量的strong标签
+			var strong = $('#count');
+
+			// 加个进度条ajax全局事件需要绑定给document,当页面中有ajax请求发送时触发
+			$(document).on('ajaxStart', function () {
+				 NProgress.start() 
+			})
+			//
+			// 加个进度条:当页面中有ajax请求完成时触发
+			$(document).on('ajaxComplete', function () {
+				NProgress.done() 
+			})
+
+			//1: 向服务器端发送请求 获取已经存在的任务
+			$.ajax({
+
+				//请求地址 url: '/todo/task',
+				 url: '/task',
+				type: 'get',
+				success: function (response) {
+					// 将已存在的任务存储在taskAry变量中
+					taskAry = response;
+					// 拼接字符串 将拼接好的字符串显示在页面中
+					render(taskAry);
+					// 计算未完成任务数量   (数组中的元素属性completed:false的数目)
+					calcCount ()
+				}
+			})
+
+			// 2:获取文本框并且添加键盘抬起事件 (这..)
+			taskInp.on('keyup', function (event) {
+				// enter回车键判断用户是否在文本框中输入了任务名称
+				if (event.keyCode == 13) {
+					//获取框输入的值
+					var taskName = $(this).val();
+					// 判断用户有没有在文本框中输入内容
+					if (taskName.trim().length == 0) {
+						alert('任务不能为空,请重新输入')
+						// 阻止代码向下执行
+						return;
+					}
+					// 向服务器端发送请求 添加任务
+					$.ajax({
+						type: 'post',
+						// url: '/todo/addTask',
+						 url: '/addTask',
+						//发送json数据
+						contentType: 'application/json',
+						//json对象=>json字符串
+						//传给S端的data是json的类型时必须手动转换成json字符串★★★
+						data: JSON.stringify({title: taskName}),
+						success: function (response) {
+							// 将任务添加到任务列表中
+							// console.log(response)
+							taskAry.push(response);
+							// 拼接字符串 将拼接好的字符串显示在页面中
+							render(taskAry);
+							// 清空文本框中的内容
+							taskInp.val('');
+							calcCount ()
+						}
+					})
+				}
+			});
+			// ★★★★★★★
+			// 2:给taskBox下类名为destroy的button(×)添加点击事件,事件冒泡=>触发ul标签身上的点击事件
+			taskBox.on('click', '.destroy', function () {
+				// 要删除的任务的id(每次在添加任务的时候,数据库会给任务发一个id,这个ID我们可以存在button的data-id属性上)
+				// attr获取对象属性的值
+				var id = $(this).attr('data-id');
+				// 向服务器端发送请求删除 任务
+				$.ajax({
+					// url: '/todo/deleteTask',
+					url: '/deleteTask',
+					type: 'get',
+					data: {
+						_id: id
+					},
+					success: function (response) {
+						// 从任务数组中找到已经删除掉的任务的索引
+						var index = taskAry.findIndex(item => item._id == id);
+						// 将任务从数组中删除
+						taskAry.splice(index, 1);
+						// 重新将任务数组中的元素显示在页面中
+						render(taskAry);
+						calcCount ()
+					}
+				})
+			});
+
+			// 3:当用户改变任务名称前面的复选框状态时触发(控制任务是否完成)
+			taskBox.on('change', '.toggle', function () {
+				// 判断复选框中是否有checked属性(jq方法)  返回一个Boolean值
+				const status = $(this).is(':checked');
+				// 当前点击任务的id(就是button的data-id)  siblings同级元素(名为button的)
+				const id = $(this).siblings('button').attr('data-id');
+				// 向服务器端发送请求 更改任务状态
+				$.ajax({
+					type: 'post',
+					// url: '/todo/modifyTask',
+					url: '/modifyTask',
+					data: JSON.stringify({_id: id, completed: status}),
+					contentType: 'application/json',
+					success: function (response) {
+						// 将任务状态同步到任务数组中
+						var task = taskAry.find(item => item._id == id);
+						// 返回的取反值重新赋值给task.completed
+						task.completed = response.completed;
+						// 将数组中任务的最新状态更新到页面中
+						render(taskAry);
+						calcCount ()
+					}
+				})
+			});
+
+			// 4:给label添加双击事件   使之能够重新编辑
+			taskBox.on('dblclick', 'label', function () {
+				// 让任务处于编辑状态
+				$(this).parent().parent().addClass('editing');
+				// 将任务名称显示在文本框中
+				$(this).parent().siblings('input').val($(this).text())
+				// 让文本框自动获取焦点可以编辑
+				$(this).parent().siblings('input').focus();
+			})
+
+			// 4:重新编辑任务,当文本框离开焦点的时候保存任务
+			taskBox.on('blur', '.edit', function () {
+				// 最新的任务名称
+				var newTaskName = $(this).val();
+				// 编辑任务的id   find方法很好用★★★★★★
+				var id = $(this).siblings().find('button').attr('data-id');
+				// 向服务器端发送请求 修改任务名称
+				$.ajax({
+					// url: '/todo/modifyTask',
+					url: '/modifyTask',
+					type: 'post',
+					data: JSON.stringify({_id: id, title: newTaskName}),
+					contentType: 'application/json',
+					success: function (response) {
+						// 将当期任务的最新状态同步到任务数组中
+						var task = taskAry.find(item => item._id == id);
+						// 修改任务名称
+						task.title = response.title;
+						// 将任务数组中的任务同步到页面中
+						render(taskAry);
+						calcCount ()
+					}
+				})
+			});
+
+			//①自定义render函数,拼接字符串 将拼接好的字符串显示在页面中
+			function render(taskAry) {
+				// 字符串拼接
+				var html = template('taskTpl', {
+					tasks: taskAry
+				});
+				// 将拼接好的字符串显示在ul任务标签中
+				taskBox.html(html);
+			}
+			//②自定义用于计算未完成任务的数量
+			function calcCount () {
+				// 存储结果的变量
+				var count = 0;
+				// 将未完成的任务过滤到一个新的数组中
+				var newAry = taskAry.filter(item => item.completed == false);
+				// 将新数组的长度赋值给count
+				count = newAry.length;
+				// 将未完成的任务数量显示在页面中
+				strong.text(count)
+			}
+
+			var filters = $('.filters');
+			filters.on('click','#all',function () {
+				$(this).parent().siblings().find('a').removeClass('selected');
+				$(this).addClass('selected');
+				var newAry = taskAry;
+				render(newAry);
+			})
+			filters.on('click','#active',function () {
+				$(this).parent().siblings().find('a').removeClass('selected');
+				$(this).addClass('selected')
+				var newAry = taskAry.filter(item => item.completed == false);
+				render(newAry);
+			})
+			filters.on('click','#actived',function () {
+				$(this).parent().siblings().find('a').removeClass('selected');
+				$(this).addClass('selected')
+				var newAry = taskAry.filter(item => item.completed == true);
+				render(newAry);
+			})
+
+			//清除已经完成的 (未完成  待续。。。。。)
+			var footer = $('.footer');
+			footer.on('click','.clear-completed',function () {
+				var unCompleted = taskAry.filter( item=>item.completed == false);
+				$.ajax({
+					url: '/clearTask',
+					type: 'get',
+					//应该发过去什么？
+					// data: JSON.stringify({_id: clearArr}),
+					contentType: 'application/json',
+					success: function (response) {
+						render(unCompleted);
+						calcCount ()
+					}
+				})
+			})
+
+		</script>
+	</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script type="text/javascript">
+		var xhr = new XMLHttpRequest();
+		//true 走S端,false 不走S端
+		xhr.open('get', 'http://localhost:3000/first', true);
+		xhr.send();
+		xhr.onreadystatechange = function (){
+			if (xhr.readyState == 4) {
+				console.log('2')
+				console.log(xhr.responseText)
+			}
+		}
+		//异步执行的时候也是1先被执行★★★
+		console.log('1');
+	</script>
+</body>
+</html>

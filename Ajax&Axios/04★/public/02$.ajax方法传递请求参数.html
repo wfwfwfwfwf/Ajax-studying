@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>$.ajax方法基本使用</title>
+</head>
+<body>
+	<button id="btn">发送请求</button>
+	<script src="/js/jquery.min.js"></script>
+	<script>
+		//$.ajax传参 data
+		var params = {name: 'wangwu', age: 300};
+
+		$('#btn').on('click', function () {
+			$.ajax({
+				// 请求方式
+				type: 'post',
+				// 请求地址
+				url: '/user',
+				// 向服务器端发送的请求参数时,
+				/*1:可以直接传对象,会自动转换参数类型data => name=zhangsan&age=100
+					data: {
+					name: 'zhangsan',
+					age: 100
+				},*/
+				//2:传给S端的data是json的类型时必须手动转换成json字符串★★★
+				data: JSON.stringify(params),
+				// 指定data:json参数的格式类型
+				contentType: 'application/json',
+
+				success: function (response) {
+							console.log(response);
+				}
+			})
+		});
+	</script>
+</body>
+</html>

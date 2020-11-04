@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+
+</head>
+<body>
+<h1>你好</h1>
+<!--	使用CDN引入axios-->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript">
+
+  axios({
+    url: 'http://localhost:3000/first/',
+    method: 'GET',
+  }).then(
+    response => {
+      console.log(response)
+    },
+    error => {
+      alert(error.message)
+    }
+  )
+</script>
+</body>
+</html>

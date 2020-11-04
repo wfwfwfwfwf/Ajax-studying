@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+</head>
+<body>
+	<h1>你好</h1>
+	<script type="text/javascript">
+		// 1.创建ajax对象
+		var xhr = new XMLHttpRequest();
+		// 2.告诉Ajax对象要向哪发送请求，以什么方式发送请求
+		// 1:请求方式 2:请求地址(向谁请求数据)   C端url的结尾与S端对应起来★★★
+		//访问的开头地址http://localhost:3000+对应文件名   ★★★
+		//这里的url写成什么,打开的时候就必须是什么★★★★
+		// 请求地址(当请求数据的S端请求协议,端口,域名 都相同时,也就是非跨域访问时,可以省略★★★★★)
+		xhr.open('get', 'http://localhost:3000/first');
+		// 3.发送请求
+		xhr.send();
+		// 4.获取服务器端响应到客户端的数据 xhr.responseText
+		xhr.onload = function (){
+			//取回的是S端返回来的数据  res.send()
+			console.log(xhr.responseText)
+		}
+
+	</script>
+</body>
+</html>
